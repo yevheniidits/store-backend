@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+cd "$(dirname "$0")/../" || exit
+HAS_DOCKER=$(which docker)
+HAS_COMPOSE=$(which docker-compose)
+
+echo "Checking pre-requirements..."
+if [ -z "$HAS_DOCKER" ]; then
+  echo "No docker installation on your system"
+  exit 1
+else
+  echo -e "Found docker installation at $HAS_DOCKER"
+fi
+
+if [ -z "$HAS_COMPOSE" ]; then
+  echo "Docker-compose was not found"
+  exit 1
+else
+  echo -e "Found docker-compose installation at $HAS_COMPOSE"
+fi
+
+#if [[ ! -d ".git" ]]; then
+#    echo -e "Git repository was not found! Initialize Git repository in order to continue."
+#    exit 0
+#fi
+
+#echo -e "#!/usr/bin/env bash\n" > .git/hooks/pre-commit
+#echo -e "docker-compose run --rm --entrypoint "pre-commit" backend" >> .git/hooks/pre-commit
+#chmod +x .git/hooks/pre-commit
+
+docker-compose build
+
+INPUT_DEFAULT=" [Y/n]"
+read -r -p "Would you like to start the docker containers right now$INPUT_DEFAULT? " OPEN_CONFIRM
+if [[ "$OPEN_CONFIRM" == "" ]]; then
+    OPEN_CONFIRM="y";
+fi
+if [[ "$OPEN_CONFIRM" == *"y"* || "$OPEN_CONFIRM" == *"Y"* ]]; then
+    docker-compose up
+else
+    echo -e "\nYou can start them manually via docker-compose up"
+fi
