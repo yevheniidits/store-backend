@@ -34,6 +34,7 @@ DEBUG = env.bool('DEBUG', default=False)
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
+AUTH_USER_MODEL = 'accounts.User'
 
 # Application definition
 
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
     'rest_framework',
 
     'apps.accounts',
+    'apps.common',
 ]
 
 MIDDLEWARE = [
