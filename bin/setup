@@ -1,34 +1,37 @@
 #!/usr/bin/env bash
 
+# navigate to projects root
 cd "$(dirname "$0")/../" || exit
+
+# define colors for better formatting
+COLOR_RED='\033[0;31m'
+COLOR_GREEN='\033[0;32m'
+COLOR_NONE='\033[0m'
+
+echo "Checking pre-requirements..."
 HAS_DOCKER=$(which docker)
 HAS_COMPOSE=$(which docker-compose)
 
-echo "Checking pre-requirements..."
 if [ -z "$HAS_DOCKER" ]; then
-  echo "No docker installation on your system"
+  echo "${COLOR_RED}No docker installation on your system${COLOR_NONE}"
   exit 1
 else
-  echo -e "Found docker installation at $HAS_DOCKER"
+  echo -e "${COLOR_GREEN}Found docker installation${COLOR_NONE} at $HAS_DOCKER"
 fi
 
 if [ -z "$HAS_COMPOSE" ]; then
-  echo "Docker-compose was not found"
+  echo -e "${COLOR_RED}Docker-compose was not found${COLOR_NONE}"
   exit 1
 else
-  echo -e "Found docker-compose installation at $HAS_COMPOSE"
+  echo -e "${COLOR_GREEN}Found docker-compose installation${COLOR_NONE} at $HAS_COMPOSE"
 fi
 
-#if [[ ! -d ".git" ]]; then
-#    echo -e "Git repository was not found! Initialize Git repository in order to continue."
-#    exit 0
-#fi
-
-#echo -e "#!/usr/bin/env bash\n" > .git/hooks/pre-commit
-#echo -e "docker-compose run --rm --entrypoint "pre-commit" backend" >> .git/hooks/pre-commit
-#chmod +x .git/hooks/pre-commit
-
 docker-compose build
+echo -e "${COLOR_GREEN}Done!${COLOR_NONE}"
+
+docker-compose up -d backend
+bash bin/manage migrate
+bash bin/manage create_super_user
 
 INPUT_DEFAULT=" [Y/n]"
 read -r -p "Would you like to start the docker containers right now$INPUT_DEFAULT? " OPEN_CONFIRM

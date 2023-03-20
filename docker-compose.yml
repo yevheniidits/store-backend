@@ -4,6 +4,8 @@ version: '3'
 volumes:
   pg_data:
     driver: local
+  redis:
+    driver: local
 
 # Custom x-attribute with common settings for backend service.
 x-base: &base-backend
@@ -13,8 +15,17 @@ x-base: &base-backend
     - .:/store:delegated
   depends_on:
     - db
+    - redis
 
 services:
+  redis:
+    image: library/redis:6.0
+    volumes:
+      - redis:/data
+    ports:
+      - '6379:6379'
+    command: redis-server --appendonly yes
+
   db:
     image: postgres:15-alpine
     environment:
@@ -35,3 +46,13 @@ services:
     ports:
       - '8000:8000'
     command: python manage.py runserver 0.0.0.0:8000
+
+  worker:
+    <<: *base-backend
+    build: .
+    command: celery -A apps.celery_app worker -l INFO -Q default
+
+  beat:
+    <<: *base-backend
+    build: .
+    command: celery -A apps.celery_app beat -l INFO -s /var/run/celerybeat-schedule --pidfile /var/run/celerybeat.pid

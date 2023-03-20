@@ -26,6 +26,4 @@ COPY requirements.txt /store/
 
 RUN pip install -r /store/requirements.txt --no-cache-dir
 
-COPY . /store/
-
 EXPOSE 8000

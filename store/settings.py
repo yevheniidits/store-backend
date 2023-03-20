@@ -169,3 +169,9 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
+
+# Celery
+# https://docs.celeryproject.org/en/stable/
+CELERY_BROKER_URL = f'{env("REDIS_URL")}/1'
+CELERY_REDIS_RETRY_ON_TIMEOUT = True
+CELERY_TASK_DEFAULT_QUEUE = 'default'
